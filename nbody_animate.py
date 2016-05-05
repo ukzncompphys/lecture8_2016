@@ -2,11 +2,12 @@ import numpy
 import time
 import matplotlib
 matplotlib.use('TkAgg')
+import matplotlib.animation as animation
 
 from matplotlib  import pyplot as plt
 
 class particles:
-    def __init__(self,m=1.0,npart=1000,soft=0.01,G=1.0,dt=0.1):
+    def __init__(self,m=1.0,npart=1000,soft=0.03,G=1.0,dt=0.1):
         self.opts={}
         self.opts['soft']=soft
         self.opts['n']=npart
@@ -33,7 +34,7 @@ class particles:
             r3=1.0/(r*rsqr)
             self.fx[i]=-numpy.sum(self.m*dx*r3)*self.opts['G']
             self.fy[i]=-numpy.sum(self.m*dy*r3)*self.opts['G']
-            pot+=self.opts['G']*numpy.sum(self.m/r)
+            pot+=self.opts['G']*numpy.sum(self.m/r)*self.m[i]
         return -0.5*pot
     def evolve(self):
         self.x+=self.vx*self.opts['dt']
@@ -48,17 +49,30 @@ class particles:
 if __name__=='__main__':
     plt.ion()
     n=1500
-    part=particles(m=1.0/n,npart=n)
+    oversamp=5
+    part=particles(m=1.0/n,npart=n,dt=0.1/oversamp)
     plt.plot(part.x,part.y,'*')
     plt.show()
     
-    for i in range(0,10000):
-        energy=part.evolve()
+
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(-5, 5), ylim=(-5, 5))
+    line, = ax.plot([], [], '*', lw=2)
+
+    #for i in range(0,10000):
+    def animate_points(crud):
+        global part,line,oversamp
+        for ii in range(oversamp):
+            energy=part.evolve()
         print energy
-        plt.clf()
-        plt.plot(part.x,part.y,'*')
-        plt.show()
-        time.sleep(2)
+        #plt.clf()
+        #plt.plot(part.x,part.y,'*')
+        line.set_data(part.x,part.y)
+        #plt.show()
         
+    ani = animation.FuncAnimation(fig, animate_points, numpy.arange(30),
+                              interval=25, blit=False)
+    plt.show()
 
         

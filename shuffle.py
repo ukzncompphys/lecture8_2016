@@ -1,6 +1,5 @@
 import sounddevice as sd
-import time,glob,numpy,random
-import subprocess
+import time,glob,numpy,random,subprocess
 
 def get_key(mystr,key):  #routine to find a key in a long strong and return that line
     i1=mystr.find(key)
